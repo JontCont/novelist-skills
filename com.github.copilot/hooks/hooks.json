@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "python3 \"${PLUGIN_ROOT}/scripts/sdd_gate_hook.py\"",
+        "windows": "python \"${PLUGIN_ROOT}/scripts/sdd_gate_hook.py\"",
+        "timeout": 15
+      }
+    ]
+  }
+}

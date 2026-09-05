@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "novelist-skills",
+  "description": "Specification-driven Chinese novel planning, drafting, retrieval, and continuity review.",
+  "version": "0.7.0",
+  "keywords": [
+    "novel-writing",
+    "chinese",
+    "rag",
+    "specification-driven"
+  ]
+}
