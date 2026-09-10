@@ -47,16 +47,57 @@ GitHub Spec Kit 的規格驅動方法帶入長篇寫作：先定義規則與故�
 ## 創作流程
 
 ```mermaid
-flowchart LR
-    A[New Story<br/>治理準則] --> B[Rule<br/>故事規格]
-    B --> C[Plan<br/>Canon 與大綱]
-    C --> D[Chapter<br/>任務與檢索]
-    D --> E{SDD Gate}
-    E -->|通過| F[Write<br/>章節草稿]
-    E -->|過期或缺漏| D
-    F --> G[Review<br/>收斂與更新狀態]
-    G --> D
+flowchart TD
+  A[使用者選擇命令] --> B{創作情境}
+
+  B -->|新增小說| C[novelist-new-story]
+  C --> D[建立專案與 Constitution]
+  D --> E[novelist-rule<br/>完成故事規格]
+  E --> F[novelist-plan<br/>角色、Canon、大綱]
+
+  B -->|下一章正片| G[產生下一個主線 ID]
+  B -->|途中新增外篇| H[建立 side ID<br/>選擇 Canon 模式]
+  B -->|插入主線章節| I[建立插入 ID<br/>分析後續影響]
+
+  F --> J[novelist-chapter<br/>準備章節]
+  G --> J
+  H --> J
+  I --> J
+
+  J --> K[建立 Chapter Task]
+  K --> L{使用者核准?}
+  L -->|否| K
+  L -->|是| M[唯讀 Analyze]
+  M --> N{規格一致?}
+
+  N -->|否| O[修正 Spec、Canon 或大綱]
+  O --> P[重新核准失效產物]
+  P --> M
+
+  N -->|是| Q[執行 RAG]
+  Q --> R[產生 Task 與語料 Hash Receipt]
+  R --> S[novelist-write]
+
+  S --> T[PreToolUse Hook]
+  T --> U{Gate 通過?}
+
+  U -->|否| V[阻止寫入]
+  V --> O
+
+  U -->|是| W[寫入章節 Draft]
+  W --> X[角色與連貫性檢查]
+  X --> Y[novelist-review]
+  Y --> Z{使用者接受?}
+
+  Z -->|否| S
+  Z -->|是| AA[更新 Summary、Canon、角色狀態]
+  AA --> AB[更新 Progress 與 RAG 知識庫]
+  AB --> A
 ```
+
+目前 `0.7.0` 已實作一般章節流程與單一 Hook dispatcher。圖中的外篇、插入章
+ID 與 `content_type` 分流是相容的擴充流程，尚未提供對應的 ID 產生器與驗證
+規則；在完成實作前，請勿將它們視為已可用命令。
 
 | Command | 工作 | 主要產物 |
 | --- | --- | --- |
@@ -165,6 +206,25 @@ constitution → specify → clarify/checklist → canon + outline
 
 Hook 是 Copilot 客戶端的強制層。不支援 Hook 的 Agent 仍能使用可攜式 Skills，
 但必須依靠工作流指令與 `sdd.py gate` 執行檢查。
+
+Hook 內部固定沿著同一條檢查鏈執行：
+
+```mermaid
+flowchart LR
+  A[PreToolUse] --> B[解析寫入路徑]
+  B --> C[辨識小說與內容類型]
+  C --> D[檢查上游核准]
+  D --> E[檢查 Chapter Task]
+  E --> F[執行唯讀 Analyze]
+  F --> G[檢查 RAG Receipt]
+  G --> H[檢查 Hash 是否過期]
+  H --> I{全部通過?}
+  I -->|是| J[允許寫入]
+  I -->|否| K[Exit Code 2 阻擋]
+```
+
+外篇與插入章不需要額外 Hook。完成 `content_type` 擴充後，兩者會共用同一個
+dispatcher，再依內容類型套用不同驗證規則。
 
 ## 專案結構
 
