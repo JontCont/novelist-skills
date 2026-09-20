@@ -58,6 +58,9 @@ class PluginTests(unittest.TestCase):
             self.assertIn("skill_context", skill)
             self.assertNotIn("../../shared/novelist/references/", skill)
             self.assertLess(len(skill), 2200, f"{command} must remain a thin command reminder")
+        new_story_skill = (ROOT / "skills/novelist-new-story/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("While waiting for approval", new_story_skill)
+        self.assertIn("/novelist-skills:novelist-rule <project>", new_story_skill)
 
     def test_project_lifecycle_and_retrieval(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

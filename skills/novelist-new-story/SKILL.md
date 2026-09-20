@@ -21,6 +21,8 @@ the `skill_context` v1 marker used by later reminder-only commands.
    durable state, and `.novelist/config.json`.
 3. Present `constitution.md` to the user. Discuss and edit binding creative
    principles until the user explicitly approves them.
+   While waiting for approval, state clearly that the next command after
+   approval is `/novelist-skills:novelist-rule <project>`.
 4. Run [sdd.py](../../shared/novelist/scripts/sdd.py) `approve` for
    `constitution.md` only after that approval.
 5. Stop. Report the project path and instruct the user to run
